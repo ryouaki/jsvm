@@ -25,10 +25,10 @@ class Scope {
     })
   }
   toJSON() {
-    return ''
+    return '[Object Scope]'
   }
   toString() {
-    return ''
+    return '[Object Scope]'
   }
 }
 
