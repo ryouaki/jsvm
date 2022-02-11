@@ -1,0 +1,24 @@
+{
+  "name": "jsvm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "dev": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryouaki/jsvm.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ryouaki/jsvm/issues"
+  },
+  "homepage": "https://github.com/ryouaki/jsvm#readme",
+  "dependencies": {
+    "acorn": "^8.7.0",
+    "jest": "^27.5.1"
+  }
+}
