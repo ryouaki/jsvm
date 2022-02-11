@@ -1,25 +1,34 @@
 class Scope {
-  constructor(parent) {
-    Object.defineProperty(this, 'values', {
-      value: new Map(),
-      writable: false
-    });
-    Object.defineProperty(this, 'parent', {
-      value: parent || {},
-      writable: false
-    });
-  }
+  constructor(parent = {}) {
+    let _values = new Map();
+    let _parent = parent;
 
-  setValue(key, value) {
-    this.values.set(key, value);
+    return new Proxy(this, {
+      get(_target, prop) {
+        if (_values.has(prop)) {
+          return _values.get(prop);
+        } else {
+          return _parent[prop];
+        }
+      },
+      set(_target, prop, value) {
+        _values.set(prop, value)
+        return true;
+      },
+      deleteProperty(_t, prop) {
+        if (_values.has(prop)) {
+          return _values.delete(prop)
+        } else if (_parent[prop]) {
+          return delete _parent[prop]
+        }
+      }
+    })
   }
-
-  getValue(key) {
-    if (this.values.has(key)) {
-      return this.values.get(key);
-    } else {
-      return this.parent.getValue(key);
-    }
+  toJSON() {
+    return '[Object Scope]'
+  }
+  toString() {
+    return '[Object Scope]'
   }
 }
 
