@@ -1,4 +1,4 @@
-const Scope = require('./scope');
+const { Scope, TScope } = require('./scope');
 
 const operatorMap = {
   '+': function (lv, rv) {

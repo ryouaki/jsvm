@@ -1,10 +1,9 @@
-const Scope = require('./scope');
 const execHandle = require('./script');
 
 module.exports = class JSVM {
   constructor(ast, ctx) {
     this._ast = ast;
-    this._ctx = new Scope(ctx);
+    this._ctx = ctx;
   }
 
   run () {
