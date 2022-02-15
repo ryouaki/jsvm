@@ -96,6 +96,7 @@ function declareVariable(ctx, name, type, value) {
 }
 
 module.exports = {
+  IValue,
   declareVariable,
   Scope
 };
