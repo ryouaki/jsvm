@@ -1,14 +1,26 @@
-// 临时性死区
-class TScope {
-  constructor(params) {
-    this.name = params.name || '';
-    this.type = params.type || 'let';
-    this.init = params.init === undefined ? true: params.init;
-    this.value = params.value || undefined;
-    this.parent = null;
+class IValue {
+  constructor(props) {
+    this.value = props;
   }
 }
-// 作用域
+class ValueVar extends IValue {
+  constructor(props) {
+    super(props)
+  }
+}
+
+class ValueLet extends IValue {
+  constructor(props) {
+    super(props)
+  }
+}
+
+class ValueConst extends IValue {
+  constructor(props) {
+    super(props)
+  }
+}
+
 class Scope {
   constructor(parent = {}) {
     let _values = new Map();
@@ -22,33 +34,39 @@ class Scope {
         } else if (_deadScope.has(prop)) {
           return _deadScope.get(prop);
         } else {
+          if (_parent[prop] instanceof ValueLet || _parent[prop] instanceof ValueConst) {
+            return undefined;
+          }
           return _parent[prop];
         }
       },
       set(_target, prop, value) {
-        if (value instanceof TScope) {
-          if (_deadScope.has(prop) && value.init) {
-            throw new SyntaxError(`Identifier '${prop}' has already been declared`)
-          }
+        const isDeclare = value instanceof IValue; // 是变量定义 否则是属性赋值
+        const val = _deadScope.get(prop) || _values.get(prop) || undefined
 
-          if (_deadScope.has(prop) && !value.init && value.type === 'const') {
-            throw new TypeError(`Assignment to constant variable '${prop}'`)
-          }
+        // let const 不能重复定义定义
+        if (isDeclare && val &&
+          ((value instanceof ValueLet || value instanceof ValueConst) || 
+            ((val instanceof ValueLet || val instanceof ValueConst) && value instanceof ValueVar))) {
+          throw new SyntaxError(`Identifier '${prop}' has already been declared`)
+        } else if (val && val instanceof ValueConst) {
+          throw new TypeError(`Assignment to constant variable '${prop}'`)
+        }
 
-          value.parent = _target
+        if ((value instanceof ValueLet || value instanceof ValueConst)) { 
           _deadScope.set(prop, value)
-          return true
-        } else {
+        } else if (val instanceof ValueLet) {
+          _deadScope.set(prop, new ValueLet(value))
+        } else if (value instanceof ValueVar) {
           _values.set(prop, value)
-          return true;
+        } else { // 动态增加属性
+          _values.set(prop, new ValueVar(value))
         }
+
+        return true
       },
-      deleteProperty(_t, prop) {
-        if (_values.has(prop)) {
-          return _values.delete(prop)
-        } else if (_parent[prop]) {
-          return delete _parent[prop]
-        }
+      deleteProperty(_t, _prop) {
+        return false; // 定义不可以被删除。但是可以被赋值undefined
       }
     })
   }
@@ -60,7 +78,24 @@ class Scope {
   }
 }
 
+// 曲线救国, 需要将定义和赋值区分对待。由于需要识别类型。因此只能除此下册
+function declareVariable(ctx, name, type, value) {
+  switch(type) {
+    case 'var':
+      ctx[name] = new ValueVar(value);
+      break;
+    case 'let':
+      ctx[name] = new ValueLet(value);
+      break;
+    case 'const':
+      ctx[name] = new ValueConst(value);
+      break;
+    default:
+      break;
+  }
+}
+
 module.exports = {
-  TScope,
+  declareVariable,
   Scope
 };
