@@ -3,7 +3,7 @@ const execHandle = require('./script');
 module.exports = class JSVM {
   constructor(ast, ctx) {
     this._ast = ast;
-    this._ctx = ctx;
+    this._ctx = ctx || {};
   }
 
   run () {

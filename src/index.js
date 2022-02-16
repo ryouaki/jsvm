@@ -7,6 +7,7 @@ module.exports = function jsvm(code, ctx) {
     return;
   }
   const _ast = parse(code, { ecmaVersion: "latest" });
-  const vm = new JSVM(_ast, new Scope(ctx));
+  const scope = new Scope(ctx)
+  const vm = new JSVM(_ast, scope);
   return vm.run();
 }

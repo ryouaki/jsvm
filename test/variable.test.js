@@ -56,5 +56,10 @@ test('Variable: 定义变量 let', () => {
 })
 
 test('Variable: 定义变量 ', () => {
+  const ret1 = jsvm(`let a = {b:1}; a;`);
+  expect(ret1).toHaveProperty('b', 1)
 
+  const ret2 = jsvm(`let a = {b:1, c: 'test'}; a;`);
+  expect(ret2).toHaveProperty('b', 1)
+  expect(ret2).toHaveProperty('c', 'test')
 })

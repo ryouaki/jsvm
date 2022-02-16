@@ -110,6 +110,17 @@ const InterpreterMap = {
     
     const fn = runCode(node.callee, ctx);
     return fn.apply(ctx, args);
+  },
+  ObjectExpression(node, env) {
+    const ret = {}
+    const len = node.properties.length;
+    for (let i = 0; i < len; i++) {
+      const prop = node.properties[i];
+      const name = prop.key.name;
+      const value = runCode(prop.value, env)
+      ret[name] = value;
+    }
+    return ret;
   }
 }
 
