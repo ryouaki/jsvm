@@ -55,3 +55,20 @@ test('Expression: 表达式 基本类型 symbol', () => {
   expect(typeof ret2).toBe('symbol')
   expect(ret2).not.toBe(Symbol('test'))
 })
+
+test('Expression: 表达式 ==', () => {
+  const ret1 = jsvm(`1 == 1`, global);
+  expect(ret1).toBe(true)
+
+  try {
+    jsvm(`a == a`, global);
+  } catch(e) {
+    expect(e.message).toBe('a is not defined')
+  }
+  
+  try {
+    jsvm(`{} == {}`, global);
+  } catch(e) {
+    expect(e.message).toBe('a is not defined')
+  }
+})

@@ -12,6 +12,12 @@ const operatorMap = {
   },
   '/': function (lv, rv) {
     return lv / rv;
+  },
+  '==': function (lv, rv) {
+    return lv == rv;
+  },
+  '===': function (lv, rv) {
+    return lv === rv;
   }
 }
 
@@ -36,6 +42,9 @@ const InterpreterMap = {
   },
   BinaryExpression(node, env) {
     const leftRet = runCode(node.left, env);
+    if (leftRet === undefined) {
+      throw new ReferenceError(`${node.left.name} is not defined`)
+    }
     const rightRet = runCode(node.right, env);
 
     return operatorMap[node.operator](leftRet, rightRet);
@@ -45,6 +54,7 @@ const InterpreterMap = {
   },
   Identifier(node, env) {
     const val = env[node.name]
+
     if (val instanceof IValue) {
       return val.value;
     }

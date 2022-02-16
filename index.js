@@ -14,4 +14,6 @@ const jsvm = require('./src/index')
 // console.log(scope.a)
 // console.log(s2.a)
 
-console.log(jsvm('var a = null; a;', global))
+// console.log(jsvm('var a = null; a;', global))
+
+{} == {}
