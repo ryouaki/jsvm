@@ -43,11 +43,12 @@ class Scope {
       set(_target, prop, value) {
         const isDeclare = value instanceof IValue; // 是变量定义 否则是属性赋值
         const val = _deadScope.get(prop) || _values.get(prop) || undefined
-
+        
         // let const 不能重复定义定义
         if (isDeclare && val &&
           ((value instanceof ValueLet || value instanceof ValueConst) || 
             ((val instanceof ValueLet || val instanceof ValueConst) && value instanceof ValueVar))) {
+              console.log(prop, val, value)
           throw new SyntaxError(`Identifier '${prop}' has already been declared`)
         } else if (val && val instanceof ValueConst) {
           throw new TypeError(`Assignment to constant variable '${prop}'`)

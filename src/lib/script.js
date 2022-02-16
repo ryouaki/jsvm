@@ -111,14 +111,38 @@ const InterpreterMap = {
     for (let i = 0; i < len; i++) {
       const dCode = node.declarations[i];
       const declarate = runCode(dCode, env);
-      declareVariable(env, declarate[0], node.kind, declarate[1])
+      const len = declarate[0].length
+      for (let j = 0; j < len; j++) {
+        declareVariable(env, declarate[0][j], node.kind, declarate[1][j])
+      }
     }
   },
   VariableDeclarator(node, env) {
-    const name = node.id.name
-    const value = node.init ? runCode(node.init, env) : node.init;
-
-    return [name, value];
+    const value = !!node.init ? runCode(node.init, env) : node.init;
+    const names = []
+    const values = []
+    if (node.id.type === 'ArrayPattern') {
+      const len = node.id.elements.length;
+      for (let i = 0; i < len; i++) {
+        const ele = node.id.elements[i]
+        if (ele.type === 'Identifier') {
+          names.push(ele.name);
+          values.push([value[i]])
+        } else if (ele.type === 'RestElement') {
+          const name = ele.argument.name;
+          const idx = names.indexOf(name)
+          if (idx < 0) {
+            names.push(name)
+            values.push(value.slice(i))
+          }
+        }
+      }
+    } else {
+      names.push(node.id.name);
+      values.push(value);
+    }
+    
+    return [names, values];
   },
   AssignmentExpression(node, env) {
     const lv = node.left
@@ -126,9 +150,20 @@ const InterpreterMap = {
 
     if (lv.type === 'Identifier') {
       env[lv.name] = operatorMap[node.operator](runCode(lv, env), rv);
+    } else if (lv.type === 'ArrayPattern') {
+      const len = lv.elements.length;
+      for (let i = 0; i < len; i++) {
+        const ele = lv.elements[i]
+        if (ele.type === 'Identifier') {
+          env[ele.name] = rv[i]
+        } else if (ele.type === 'RestElement') {
+          const name = ele.argument.name;
+          env[name] = rv.slice(i) || []
+        }
+      }
     }
 
-    return env[lv.name].value;
+    return undefined;
   },
   ArrayExpression(node, env) {
     const len = node.elements.length;

@@ -216,3 +216,8 @@ test('Expression: 表达式 delete', () => {
   const ret1 = jsvm(`let a = {b: 1}; delete a.b; a`, global);
   expect(ret1.b).toBeUndefined()
 })
+
+test('Expression: 表达式 Destructuring', () => {
+  const ret1 = jsvm(`let [a, b] = [1, 2]; let [c, d, ...rest] = [1,2,3,4,5,6]`, global);
+  expect(ret1.b).toBeUndefined()
+})
