@@ -18,12 +18,51 @@ const operatorMap = {
   },
   '===': function (lv, rv) {
     return lv === rv;
-  }
-}
-
-const assignmentMap = {
+  },
+  '&': function (lv, rv) {
+    return lv & rv;
+  },
+  '~': function (lv, rv) {
+    return ~rv;
+  },
   '=': function (_lv, rv) {
-    return rv
+    return rv;
+  },
+  '+=': function (lv, rv) {
+    return lv + rv;
+  },
+  '-=': function (lv, rv) {
+    return lv - rv;
+  },
+  '&=': function (lv, rv) {
+    return lv & rv;
+  },
+  '|': function (lv, rv) {
+    return lv | rv;
+  },
+  '|=': function (lv, rv) {
+    return lv | rv;
+  },
+  '^': function (lv, rv) {
+    return lv ^ rv;
+  },
+  '^=': function (lv, rv) {
+    return lv ^ rv;
+  },
+  'true--': function (lv, rv) {
+    return --rv;
+  },
+  'false--': function (lv, rv) {
+    return rv--;
+  },
+  'true++': function (lv, rv) {
+    return ++rv;
+  },
+  'false++': function (lv, rv) {
+    return rv++;
+  },
+  'delete': function (lv, rv) {
+    return delete lv[rv];
   }
 }
 
@@ -77,7 +116,7 @@ const InterpreterMap = {
   },
   VariableDeclarator(node, env) {
     const name = node.id.name
-    const value = runCode(node.init, env)
+    const value = node.init ? runCode(node.init, env) : node.init;
 
     return [name, value];
   },
@@ -86,10 +125,10 @@ const InterpreterMap = {
     const rv = runCode(node.right, env)
 
     if (lv.type === 'Identifier') {
-      env[lv.name] = rv;
+      env[lv.name] = operatorMap[node.operator](runCode(lv, env), rv);
     }
 
-    return rv;
+    return env[lv.name].value;
   },
   ArrayExpression(node, env) {
     const len = node.elements.length;
@@ -131,11 +170,37 @@ const InterpreterMap = {
       ret[name] = value;
     }
     return ret;
+  },
+  ConditionalExpression(node, env) {
+    if (runCode(node.test, env)) {
+      return runCode(node.consequent, env);
+    } else {
+      return runCode(node.alternate, env);
+    }
+  },
+  SequenceExpression(node, env) {
+    let ret = undefined;
+    const len = node.expressions.length;
+    for (let i = 0; i < len; i++) {
+      const eCode = node.expressions[i];
+      ret = runCode(eCode, env);
+    }
+    return ret;
+  },
+  UnaryExpression(node, env) {
+    if (node.operator === 'delete') {
+      return operatorMap[node.operator](runCode(node.argument.object, env), node.argument.property.name);  
+    }
+    return operatorMap[node.operator](null, runCode(node.argument, env));
+  },
+  UpdateExpression(node, env) {
+    return operatorMap[node.prefix + '' +node.operator](null, runCode(node.argument, env));
   }
 }
 
 function runCode (node, env) {
-  return InterpreterMap[node.type](node, env);
+  if (node)
+    return InterpreterMap[node.type](node, env);
 }
 
 module.exports = runCode;
