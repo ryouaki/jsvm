@@ -63,6 +63,30 @@ const operatorMap = {
   },
   'delete': function (lv, rv) {
     return delete lv[rv];
+  },
+  '/=': function (lv, rv) {
+    return lv / rv;
+  },
+  '**': function (lv, rv) {
+    return lv ** rv;
+  },
+  '**=': function (lv, rv) {
+    return lv ** rv;
+  },
+  '>': function (lv, rv) {
+    return lv > rv;
+  },
+  '>=': function (lv, rv) {
+    return lv >= rv;
+  },
+  '<': function (lv, rv) {
+    return lv < rv;
+  },
+  '<=': function (lv, rv) {
+    return lv <= rv;
+  },
+  'in': function (lv, rv) {
+    return lv in rv;
   }
 }
 
@@ -127,7 +151,7 @@ const InterpreterMap = {
         const ele = node.id.elements[i]
         if (ele.type === 'Identifier') {
           names.push(ele.name);
-          values.push([value[i]])
+          values.push(value[i])
         } else if (ele.type === 'RestElement') {
           const name = ele.argument.name;
           const idx = names.indexOf(name)
@@ -147,23 +171,22 @@ const InterpreterMap = {
   AssignmentExpression(node, env) {
     const lv = node.left
     const rv = runCode(node.right, env)
-
+    let ret = undefined;
     if (lv.type === 'Identifier') {
-      env[lv.name] = operatorMap[node.operator](runCode(lv, env), rv);
+      env[lv.name] = ret = operatorMap[node.operator](runCode(lv, env), rv);
     } else if (lv.type === 'ArrayPattern') {
       const len = lv.elements.length;
       for (let i = 0; i < len; i++) {
         const ele = lv.elements[i]
         if (ele.type === 'Identifier') {
-          env[ele.name] = rv[i]
+          env[ele.name] = ret = rv[i]
         } else if (ele.type === 'RestElement') {
-          const name = ele.argument.name;
-          env[name] = rv.slice(i) || []
+          env[ele.argument.name] = ret = rv.slice(i) || []
         }
       }
     }
 
-    return undefined;
+    return ret;
   },
   ArrayExpression(node, env) {
     const len = node.elements.length;

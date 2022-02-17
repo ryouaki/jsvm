@@ -4,9 +4,6 @@ test('Expression: 表达式 基本类型 number', () => {
   const ctx = {}
   const ret1 = jsvm(`2`, ctx);
   expect(ret1).toBe(2)
-
-  const ret2 = jsvm(`2 + 2`, ctx);
-  expect(ret2).toBe(4)
 })
 
 test('Expression: 表达式 基本类型 string', () => {
@@ -65,6 +62,87 @@ test('Expression: 表达式 =', () => {
 
   const ret3 = jsvm(`let a = '1' + 1; a;`, global);
   expect(ret3).toBe('11')
+})
+
+test('Expression: 表达式 +', () => {
+  const ret1 = jsvm(`1 + 1;`, global);
+  expect(ret1).toBe(2)
+})
+
+test('Expression: 表达式 -', () => {
+  const ret1 = jsvm(`1 - 1;`, global);
+  expect(ret1).toBe(0)
+})
+
+test('Expression: 表达式 *', () => {
+  const ret1 = jsvm(`1 * 1;`, global);
+  expect(ret1).toBe(1)
+})
+
+test('Expression: 表达式 /', () => {
+  const ret1 = jsvm(`1 / 1;`, global);
+  expect(ret1).toBe(1)
+
+  const ret2 = jsvm(`1 / 0;`, global);
+  expect(ret2).toBe(Infinity)
+})
+
+test('Expression: 表达式 /=', () => {
+  const ret1 = jsvm(`let a = 1; a /= 2;`, global);
+  expect(ret1).toBe(0.5)
+})
+
+test('Expression: 表达式 **', () => {
+  const ret1 = jsvm(`2 ** 4;`, global);
+  expect(ret1).toBe(16)
+})
+
+test('Expression: 表达式 **=', () => {
+  const ret1 = jsvm(`let a = 2; a **= 4;`, global);
+  expect(ret1).toBe(16)
+})
+
+test('Expression: 表达式 in', () => {
+  const ret1 = jsvm(`let a = { b : 1}; 'b' in a;`, global);
+  expect(ret1).toBe(true)
+})
+
+test('Expression: 表达式 >', () => {
+  const ret1 = jsvm(`1 > 2`, global);
+  expect(ret1).toBe(false)
+
+  const ret2 = jsvm(`2 > 1`, global);
+  expect(ret2).toBe(true)
+})
+
+test('Expression: 表达式 >=', () => {
+  const ret1 = jsvm(`1 >= 2`, global);
+  expect(ret1).toBe(false)
+
+  const ret2 = jsvm(`2 >= 1`, global);
+  expect(ret2).toBe(true)
+
+  const ret3 = jsvm(`1 >= 1`, global);
+  expect(ret3).toBe(true)
+})
+
+test('Expression: 表达式 <', () => {
+  const ret1 = jsvm(`1 < 2`, global);
+  expect(ret1).toBe(true)
+
+  const ret2 = jsvm(`2 < 1`, global);
+  expect(ret2).toBe(false)
+})
+
+test('Expression: 表达式 <=', () => {
+  const ret1 = jsvm(`1 <= 2`, global);
+  expect(ret1).toBe(true)
+
+  const ret2 = jsvm(`2 <= 1`, global);
+  expect(ret2).toBe(false)
+
+  const ret3 = jsvm(`1 <= 1`, global);
+  expect(ret3).toBe(true)
 })
 
 test('Expression: 表达式 ,', () => {
@@ -218,6 +296,12 @@ test('Expression: 表达式 delete', () => {
 })
 
 test('Expression: 表达式 Destructuring', () => {
-  const ret1 = jsvm(`let [a, b] = [1, 2]; let [c, d, ...rest] = [1,2,3,4,5,6]`, global);
-  expect(ret1.b).toBeUndefined()
+  const ret1 = jsvm(`let [a, b] = [1, 2];a;`, global);
+  expect(ret1).toBe(1)
+
+  const ret2 = jsvm(`let [a, b] = [1, 2];b;`, global);
+  expect(ret2).toBe(2)
+
+  const ret3 = jsvm(`let [a, b, ...c] = [1, 2, 3,4,5,6];c;`, global);
+  expect(ret3).toEqual(expect.arrayContaining([3,4,5,6]))
 })

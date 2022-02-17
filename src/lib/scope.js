@@ -48,7 +48,6 @@ class Scope {
         if (isDeclare && val &&
           ((value instanceof ValueLet || value instanceof ValueConst) || 
             ((val instanceof ValueLet || val instanceof ValueConst) && value instanceof ValueVar))) {
-              console.log(prop, val, value)
           throw new SyntaxError(`Identifier '${prop}' has already been declared`)
         } else if (val && val instanceof ValueConst) {
           throw new TypeError(`Assignment to constant variable '${prop}'`)
