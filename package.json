@@ -19,6 +19,7 @@
   "homepage": "https://github.com/ryouaki/jsvm#readme",
   "dependencies": {
     "acorn": "^8.7.0",
+    "htmlparser2": "^7.2.0",
     "jest": "^27.5.1"
   }
 }
