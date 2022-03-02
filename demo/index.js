@@ -44,7 +44,9 @@ function test1() {
                     return [4 /*yield*/, test2()];
                 case 1:
                     _a.sent();
-                    console.log('test1 2');
+                    return [4 /*yield*/, test3()];
+                case 2:
+                    _a.sent();
                     return [2 /*return*/];
             }
         });
@@ -52,5 +54,8 @@ function test1() {
 }
 function test2() {
     console.log('test2');
+}
+function test3() {
+    console.log('test3');
 }
 test1();
